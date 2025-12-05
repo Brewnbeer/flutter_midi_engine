@@ -1,3 +1,11 @@
+## 0.1.2
+
+* Fixed Android MidiDriver API compatibility issues
+* Updated to use MidiDriver.getInstance() instead of constructor
+* Added comprehensive example app with interactive piano keyboard
+* Example includes instrument selection, volume control, and visual feedback
+* Improved Android build stability
+
 ## 0.1.1
 
 * Fixed Android build issue with mididriver dependency
