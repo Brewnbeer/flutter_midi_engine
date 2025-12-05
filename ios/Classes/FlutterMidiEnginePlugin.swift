@@ -238,13 +238,14 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
         }
 
         // Load the soundfont
+        var soundfontURLCopy = soundfontURL as CFURL
         let status = AudioUnitSetProperty(
             sampler,
             AudioUnitPropertyID(kMusicDeviceProperty_SoundBankURL),
             AudioUnitScope(kAudioUnitScope_Global),
             0,
-            &soundfontURL as! UnsafeRawPointer,
-            UInt32(MemoryLayout<URL>.size)
+            &soundfontURLCopy,
+            UInt32(MemoryLayout<CFURL>.size)
         )
 
         if status != noErr {
