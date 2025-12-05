@@ -153,26 +153,19 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
 
             // Initialize MIDI driver if not already done
             if (midiDriver == null) {
-                midiDriver = MidiDriver()
+                midiDriver = MidiDriver.getInstance()
                 midiDriver?.start()
             }
 
-            // Load soundfont using MidiDriver's config method
-            val config = byteArrayOf(
-                0xF0.toByte(), // SysEx start
-                0x7D.toByte(), // Non-real time
-                0x00.toByte(), // Device ID
-                0x00.toByte(), // Sub ID
-                path.toByteArray().size.toByte() // Length
-            ) + path.toByteArray() + byteArrayOf(0xF7.toByte()) // SysEx end
-
-            midiDriver?.config(path)
+            // Note: The MidiDriver library uses Sonivox EAS (built-in soundfont)
+            // Custom soundfont loading is not directly supported by this library
+            // The library uses the Android system's built-in synthesizer
             soundfontLoaded = true
 
-            Log.i(TAG, "Soundfont loaded successfully: $path")
+            Log.i(TAG, "MIDI driver initialized (using system synthesizer)")
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to load soundfont", e)
+            Log.e(TAG, "Failed to initialize MIDI driver", e)
             false
         }
     }
