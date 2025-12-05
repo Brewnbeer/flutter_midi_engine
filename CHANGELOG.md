@@ -1,3 +1,9 @@
+## 0.1.1
+
+* Fixed Android build issue with mididriver dependency
+* Added JitPack repository for Android native library
+* Updated mididriver to version 1.25
+
 ## 0.1.0
 
 * Initial release of Flutter MIDI Engine
