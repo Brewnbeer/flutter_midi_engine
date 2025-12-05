@@ -18,6 +18,7 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 
@@ -55,5 +56,5 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
 
     // FluidSynth for Android - supports SF2/SF3
-    implementation 'io.github.billthefarmer:mididriver:1.23'
+    implementation 'com.github.billthefarmer:mididriver:1.25'
 }
