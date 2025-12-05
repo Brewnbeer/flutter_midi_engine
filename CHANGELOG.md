@@ -1,3 +1,8 @@
+## 0.1.3
+
+* Fixed iOS build issue with AudioUnitSetProperty CFURL parameter
+* Resolved Swift compiler error: '&' may only be used to pass an argument to inout parameter
+
 ## 0.1.2
 
 * Fixed Android MidiDriver API compatibility issues
