@@ -48,7 +48,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.1.4
+  flutter_midi_engine: ^0.1.5
 ```
 
 ## Getting Started
@@ -161,7 +161,7 @@ await midiEngine.loadSoundfontFromAsset('assets/soundfonts/piano.sf2');
 
 ## Audio Routing (Headset / Bluetooth)
 
-As of v0.1.4 the engine follows the active audio output device automatically. When a
+As of v0.1.5 the engine follows the active audio output device automatically. When a
 wired or Bluetooth headset is connected or disconnected during playback, audio is
 re-bound to the new route instead of cutting out — in both directions (speaker →
 headset and headset → speaker). You don't need to re-initialize the engine yourself.
@@ -266,7 +266,7 @@ Free soundfonts you can use:
 ### Audio routing
 
 **Issue**: Sound stops when connecting/disconnecting a headset
-- This is handled automatically as of **v0.1.4** — upgrade if you are on an older
+- This is handled automatically as of **v0.1.5** — upgrade if you are on an older
   release. Audio re-binds to the active output device on both Android and iOS.
 
 ## Contributing

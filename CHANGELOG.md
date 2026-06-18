@@ -1,4 +1,4 @@
-## 0.1.4
+## 0.1.5
 
 * **Fixed audio routing on headset/Bluetooth connect & disconnect.** Audio now
   follows the active output device instead of cutting out:

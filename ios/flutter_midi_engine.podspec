@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_midi_engine'
-  s.version          = '0.1.4'
+  s.version          = '0.1.5'
   s.summary          = 'Advanced MIDI synthesizer plugin with SF2/SF3 soundfont support'
   s.description      = <<-DESC
 Flutter MIDI Engine provides comprehensive MIDI synthesis capabilities with support for SF2/SF3 soundfonts,
