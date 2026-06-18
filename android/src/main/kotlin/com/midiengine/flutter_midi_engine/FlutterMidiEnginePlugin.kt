@@ -1,8 +1,12 @@
 package com.midiengine.flutter_midi_engine
 
 import android.content.Context
+import android.media.AudioDeviceCallback
+import android.media.AudioDeviceInfo
 import android.media.AudioManager
-import android.media.SoundPool
+import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -19,6 +23,8 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var context: Context
     private var midiDriver: MidiDriver? = null
     private var soundfontLoaded = false
+    private var audioDeviceCallback: AudioDeviceCallback? = null
+    private val mainHandler = Handler(Looper.getMainLooper())
 
     companion object {
         private const val TAG = "FlutterMidiEngine"
@@ -44,6 +50,59 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
         context = flutterPluginBinding.applicationContext
         channel = MethodChannel(flutterPluginBinding.binaryMessenger, CHANNEL_NAME)
         channel.setMethodCallHandler(this)
+        registerAudioRouteListener()
+    }
+
+    /**
+     * Registers a callback that fires when audio output devices are added or removed
+     * (wired headset plugged in/out, Bluetooth connected/disconnected). The Sonivox
+     * MidiDriver binds its internal AudioTrack to the active output device when it
+     * starts, so on a route change we restart the driver to re-bind audio to the new
+     * device instead of going silent.
+     */
+    private fun registerAudioRouteListener() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager ?: return
+        // Ignore the initial callback that fires with the already-connected devices at
+        // registration time; only react to genuine route changes afterwards.
+        var initialized = false
+        val callback = object : AudioDeviceCallback() {
+            override fun onAudioDevicesAdded(addedDevices: Array<out AudioDeviceInfo>?) {
+                if (initialized) handleRouteChange()
+            }
+
+            override fun onAudioDevicesRemoved(removedDevices: Array<out AudioDeviceInfo>?) {
+                if (initialized) handleRouteChange()
+            }
+        }
+        audioManager.registerAudioDeviceCallback(callback, mainHandler)
+        initialized = true
+        audioDeviceCallback = callback
+    }
+
+    private fun unregisterAudioRouteListener() {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) return
+        val callback = audioDeviceCallback ?: return
+        val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as? AudioManager
+        audioManager?.unregisterAudioDeviceCallback(callback)
+        audioDeviceCallback = null
+    }
+
+    /**
+     * Restarts the MIDI driver so its AudioTrack is recreated on the current output
+     * route. No-op when no soundfont/driver is active.
+     */
+    private fun handleRouteChange() {
+        if (!soundfontLoaded) return
+        val driver = midiDriver ?: return
+        try {
+            driver.stop()
+            driver.start()
+            Log.i(TAG, "Audio route changed; MIDI driver restarted")
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to restart MIDI driver after route change", e)
+        }
     }
 
     override fun onMethodCall(@NonNull call: MethodCall, @NonNull result: Result) {
@@ -288,6 +347,7 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
 
     override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
         channel.setMethodCallHandler(null)
+        unregisterAudioRouteListener()
         unloadSoundfont()
     }
 }

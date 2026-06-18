@@ -19,11 +19,98 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
 
     public override init() {
         super.init()
+        setupAudioSession()
         setupAudioGraph()
     }
 
     deinit {
+        NotificationCenter.default.removeObserver(self)
         cleanup()
+    }
+
+    /// Configures and activates the shared audio session for music playback and
+    /// registers for route-change / interruption notifications so the engine can
+    /// follow the active output device (speaker, wired headset, Bluetooth, AirPlay).
+    private func setupAudioSession() {
+        let session = AVAudioSession.sharedInstance()
+        do {
+            try session.setCategory(.playback,
+                                    mode: .default,
+                                    options: [.allowBluetoothA2DP, .allowAirPlay])
+            try session.setActive(true)
+        } catch {
+            print("Failed to configure audio session: \(error)")
+        }
+
+        let center = NotificationCenter.default
+        center.addObserver(self,
+                           selector: #selector(handleRouteChange(_:)),
+                           name: AVAudioSession.routeChangeNotification,
+                           object: nil)
+        center.addObserver(self,
+                           selector: #selector(handleInterruption(_:)),
+                           name: AVAudioSession.interruptionNotification,
+                           object: nil)
+    }
+
+    /// Restarts the audio graph when the output route changes (e.g. a headset is
+    /// plugged in or unplugged, or a Bluetooth device connects/disconnects) so audio
+    /// is re-bound to the new device instead of going silent.
+    @objc private func handleRouteChange(_ notification: Notification) {
+        guard let info = notification.userInfo,
+              let reasonValue = info[AVAudioSessionRouteChangeReasonKey] as? UInt,
+              let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+            return
+        }
+
+        switch reason {
+        case .newDeviceAvailable, .oldDeviceUnavailable, .override, .routeConfigurationChange:
+            restartAudioEngine()
+        default:
+            break
+        }
+    }
+
+    /// Reactivates the session and restarts the graph after an interruption ends
+    /// (e.g. an incoming phone call or another app taking the audio session).
+    @objc private func handleInterruption(_ notification: Notification) {
+        guard let info = notification.userInfo,
+              let typeValue = info[AVAudioSessionInterruptionTypeKey] as? UInt,
+              let type = AVAudioSession.InterruptionType(rawValue: typeValue) else {
+            return
+        }
+
+        if type == .ended {
+            restartAudioEngine()
+        }
+    }
+
+    /// Reactivates the audio session and bounces the AUGraph so the RemoteIO unit
+    /// picks up the current hardware route. Runs on the main queue because route and
+    /// interruption notifications can be delivered on an arbitrary thread.
+    private func restartAudioEngine() {
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
+
+            do {
+                try AVAudioSession.sharedInstance().setActive(true)
+            } catch {
+                print("Failed to reactivate audio session: \(error)")
+            }
+
+            guard let graph = self.processingGraph else { return }
+
+            var isRunning: DarwinBoolean = false
+            AUGraphIsRunning(graph, &isRunning)
+            if isRunning.boolValue {
+                AUGraphStop(graph)
+            }
+
+            let status = AUGraphStart(graph)
+            if status != noErr {
+                print("Failed to restart AUGraph after route change: \(status)")
+            }
+        }
     }
 
     private func setupAudioGraph() {
@@ -385,7 +472,9 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
 
     private func unmute() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(.playback)
+            try AVAudioSession.sharedInstance().setCategory(.playback,
+                                                            mode: .default,
+                                                            options: [.allowBluetoothA2DP, .allowAirPlay])
             try AVAudioSession.sharedInstance().setActive(true)
             print("Audio session unmuted")
         } catch {

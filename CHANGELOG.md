@@ -1,3 +1,24 @@
+## 0.1.4
+
+* **Fixed audio routing on headset/Bluetooth connect & disconnect.** Audio now
+  follows the active output device instead of cutting out:
+  * Android: registers an `AudioDeviceCallback` and restarts the MIDI driver when
+    output devices are added/removed so its `AudioTrack` re-binds to the new route.
+  * iOS: configures the `AVAudioSession` for playback (with Bluetooth A2DP and AirPlay)
+    and observes route-change and interruption notifications, restarting the audio
+    graph so the `RemoteIO` unit picks up the new device.
+* Hardened iOS support: the audio session is now configured and activated at startup,
+  and recovers automatically after interruptions (e.g. phone calls).
+* Added support for Flutter 3.44 and Dart 3.12
+* Migrated the Android build to built-in Kotlin support (Flutter 3.44 breaking change).
+  The `kotlin-android` plugin is now only applied on AGP 8 and earlier, so the plugin
+  builds against both AGP 8 and AGP 9 / built-in Kotlin
+* Replaced the deprecated `kotlinOptions`/`buildscript` Kotlin classpath with the
+  `kotlin { compilerOptions { ... } }` DSL and bumped the Kotlin JVM target to 17
+* Bumped Android `compileSdk` to 36 and `minSdk` to 24
+* Bumped the minimum iOS deployment target to 13.0
+* Fixed placeholder metadata (homepage, author, version) in the iOS podspec
+
 ## 0.1.3
 
 * Fixed iOS build issue with AudioUnitSetProperty CFURL parameter

@@ -1,16 +1,10 @@
-group 'com.midiengine.flutter_midi_engine'
-version '1.0-SNAPSHOT'
+group = 'com.midiengine.flutter_midi_engine'
+version = '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.9.10'
     repositories {
         google()
         mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -18,33 +12,34 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url 'https://jitpack.io' }
+        maven { url = 'https://jitpack.io' }
     }
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
+
+// Built-in Kotlin migration (Flutter 3.44+).
+// Android Gradle Plugin 9 ships Kotlin support built in. On AGP 8 and earlier the
+// legacy Kotlin Gradle plugin must still be applied, so detect the AGP version and
+// only apply 'kotlin-android' when running against AGP < 9. This keeps the plugin
+// building on both AGP 8 and AGP 9 projects.
+// See https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin
+def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
+if (agpMajor < 9) {
+    apply plugin: 'kotlin-android'
+}
 
 android {
-    compileSdkVersion 34
-    namespace 'com.midiengine.flutter_midi_engine'
+    namespace = 'com.midiengine.flutter_midi_engine'
+    compileSdk = 36
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     defaultConfig {
-        minSdkVersion 21
-        targetSdkVersion 34
+        minSdk = 24
 
         ndk {
             abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86', 'x86_64'
@@ -52,9 +47,13 @@ android {
     }
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
 
-    // FluidSynth for Android - supports SF2/SF3
+dependencies {
+    // FluidSynth-compatible MIDI driver for Android - supports SF2/SF3
     implementation 'com.github.billthefarmer:mididriver:1.25'
 }
