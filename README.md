@@ -14,6 +14,9 @@ An advanced MIDI synthesizer plugin for Flutter with comprehensive support for S
   - Pitch bend messages
   - Control change messages
   - All notes off / reset controllers
+- **Automatic Audio Routing**: Audio follows the active output device — plug in or
+  unplug a wired/Bluetooth headset mid-playback and sound switches over automatically
+  (no manual re-initialization required)
 - **Cross-Platform**: Works on Android, iOS, and Web (Web support is experimental)
 
 ## Platform Support
@@ -27,13 +30,25 @@ An advanced MIDI synthesizer plugin for Flutter with comprehensive support for S
 | Windows  | 🚧 Planned | - |
 | Linux    | 🚧 Planned | - |
 
+## Requirements
+
+| Tool | Minimum version |
+|------|-----------------|
+| Flutter | 3.44.0 |
+| Dart | 3.10 |
+| Android | `minSdk` 24 (Android 7.0) |
+| iOS | 13.0 |
+
+> Built and validated against Flutter 3.44. The Android module uses Flutter's
+> built-in Kotlin support and builds against both AGP 8 and AGP 9.
+
 ## Installation
 
 Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.1.0
+  flutter_midi_engine: ^0.1.4
 ```
 
 ## Getting Started
@@ -144,6 +159,22 @@ await midiEngine.unmute();
 await midiEngine.loadSoundfontFromAsset('assets/soundfonts/piano.sf2');
 ```
 
+## Audio Routing (Headset / Bluetooth)
+
+As of v0.1.4 the engine follows the active audio output device automatically. When a
+wired or Bluetooth headset is connected or disconnected during playback, audio is
+re-bound to the new route instead of cutting out — in both directions (speaker →
+headset and headset → speaker). You don't need to re-initialize the engine yourself.
+
+Under the hood:
+
+- **Android** listens for output-device changes (`AudioDeviceCallback`) and restarts
+  the MIDI driver so its audio track re-binds to the current device.
+- **iOS** configures the `AVAudioSession` for playback (including Bluetooth A2DP and
+  AirPlay), observes route-change and interruption notifications, and restarts the
+  audio graph so the sampler follows the new device. It also recovers automatically
+  after interruptions such as phone calls.
+
 ## Example App
 
 Check out the [example](example/) directory for a complete piano app demonstrating all features.
@@ -231,6 +262,12 @@ Free soundfonts you can use:
 **Issue**: Soundfont not found
 - Verify the file path is correct
 - When using assets, make sure the file is listed in `pubspec.yaml`
+
+### Audio routing
+
+**Issue**: Sound stops when connecting/disconnecting a headset
+- This is handled automatically as of **v0.1.4** — upgrade if you are on an older
+  release. Audio re-binds to the active output device on both Android and iOS.
 
 ## Contributing
 
