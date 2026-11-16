@@ -10,6 +10,7 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
     private var ioNode = AUNode()
     private var samplerUnit: AudioUnit?
     private var soundfontLoaded = false
+    private var soundbankURL: URL?
 
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "flutter_midi_engine", binaryMessenger: registrar.messenger())
@@ -313,40 +314,72 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
     }
 
     private func loadSoundfont(path: String) -> Bool {
-        guard let sampler = samplerUnit else {
+        guard samplerUnit != nil else {
             print("Sampler unit not initialized")
             return false
         }
 
-        let soundfontURL = URL(fileURLWithPath: path)
-        guard FileManager.default.fileExists(atPath: path) else {
-            print("Soundfont file not found: \(path)")
+        // iOS has no system General MIDI sounds, so an empty path uses the
+        // small soundfont bundled with the plugin (ios/Resources).
+        guard let file = path.isEmpty ? FlutterMidiEnginePlugin.bundledSoundfontPath() : path else {
+            print("Bundled soundfont not found")
+            return false
+        }
+        guard FileManager.default.fileExists(atPath: file) else {
+            print("Soundfont file not found: \(file)")
             return false
         }
 
-        // Load the soundfont
-        var soundfontURLCopy = soundfontURL as CFURL
-        let status = AudioUnitSetProperty(
-            sampler,
-            AudioUnitPropertyID(kMusicDeviceProperty_SoundBankURL),
-            AudioUnitScope(kAudioUnitScope_Global),
-            0,
-            &soundfontURLCopy,
-            UInt32(MemoryLayout<CFURL>.size)
-        )
-
+        soundbankURL = URL(fileURLWithPath: file)
+        let status = loadInstrument(program: 0)
         if status != noErr {
             print("Failed to load soundfont: \(status)")
+            soundbankURL = nil
             return false
         }
 
         soundfontLoaded = true
-        print("Soundfont loaded successfully: \(path)")
         return true
+    }
+
+    private static func bundledSoundfontPath() -> String? {
+        let bundle = Bundle(for: FlutterMidiEnginePlugin.self)
+        if let url = bundle.url(forResource: "flutter_midi_engine_sounds", withExtension: "bundle"),
+           let resources = Bundle(url: url),
+           let path = resources.path(forResource: "flutter_midi_engine_basic", ofType: "sf2") {
+            return path
+        }
+        return bundle.path(forResource: "flutter_midi_engine_basic", ofType: "sf2")
+    }
+
+    // AUSampler plays one instrument at a time, so a program change loads
+    // that preset from the current soundfont.
+    private func loadInstrument(program: Int) -> OSStatus {
+        guard let sampler = samplerUnit, let url = soundbankURL else { return -1 }
+
+        let cfURL = url as CFURL
+        return withExtendedLifetime(cfURL) {
+            var data = AUSamplerInstrumentData(
+                fileURL: Unmanaged.passUnretained(cfURL),
+                instrumentType: UInt8(kInstrumentType_SF2Preset),
+                bankMSB: UInt8(kAUSampler_DefaultMelodicBankMSB),
+                bankLSB: UInt8(kAUSampler_DefaultBankLSB),
+                presetID: UInt8(program & 0x7F)
+            )
+            return AudioUnitSetProperty(
+                sampler,
+                AudioUnitPropertyID(kAUSamplerProperty_LoadInstrument),
+                AudioUnitScope(kAudioUnitScope_Global),
+                0,
+                &data,
+                UInt32(MemoryLayout<AUSamplerInstrumentData>.size)
+            )
+        }
     }
 
     private func unloadSoundfont() -> Bool {
         soundfontLoaded = false
+        soundbankURL = nil
         // Reset the sampler by stopping and restarting the graph
         if let graph = processingGraph {
             AUGraphStop(graph)
@@ -389,16 +422,11 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
     }
 
     private func changeProgram(program: Int, channel: Int) {
-        guard soundfontLoaded, let sampler = samplerUnit else { return }
-
-        let programCommand = UInt32(0xC0 | (channel & 0x0F))
-        MusicDeviceMIDIEvent(
-            sampler,
-            programCommand,
-            UInt32(program & 0x7F),
-            0,
-            0
-        )
+        guard soundfontLoaded else { return }
+        let status = loadInstrument(program: program)
+        if status != noErr {
+            print("Failed to load program \(program): \(status)")
+        }
     }
 
     private func setVolume(volume: Int, channel: Int) {

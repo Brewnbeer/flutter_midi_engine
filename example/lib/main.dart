@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 import 'package:flutter_midi_engine/flutter_midi_engine.dart';
 
 void main() {

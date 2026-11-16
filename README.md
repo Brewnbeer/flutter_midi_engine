@@ -17,16 +17,16 @@ An advanced MIDI synthesizer plugin for Flutter with comprehensive support for S
 - **Automatic Audio Routing**: Audio follows the active output device — plug in or
   unplug a wired/Bluetooth headset mid-playback and sound switches over automatically
   (no manual re-initialization required)
-- **Cross-Platform**: Works on Android, iOS, and Web (Web support is experimental)
+- **Cross-Platform**: Works on Android, iOS and macOS (Web support is experimental)
 
 ## Platform Support
 
 | Platform | Status | Technology |
 |----------|--------|------------|
-| Android  | ✅ Fully Supported | MidiDriver (FluidSynth-based) |
+| Android  | ✅ Fully Supported | MidiDriver (Sonivox EAS) |
 | iOS      | ✅ Fully Supported | AVFoundation AudioUnit Sampler |
 | Web      | ⚠️ Experimental | Stub implementation (requires JS library) |
-| macOS    | 🚧 Planned | Similar to iOS |
+| macOS    | ✅ Supported (new in 0.2.0) | AudioToolbox AUSampler |
 | Windows  | 🚧 Planned | - |
 | Linux    | 🚧 Planned | - |
 
@@ -34,13 +34,20 @@ An advanced MIDI synthesizer plugin for Flutter with comprehensive support for S
 
 | Tool | Minimum version |
 |------|-----------------|
-| Flutter | 3.44.0 |
-| Dart | 3.10 |
+| Flutter | 3.50.0 |
+| Dart | 3.14 |
 | Android | `minSdk` 24 (Android 7.0) |
 | iOS | 13.0 |
+| macOS | 10.15 |
 
-> Built and validated against Flutter 3.44. The Android module uses Flutter's
-> built-in Kotlin support and builds against both AGP 8 and AGP 9.
+> Tested with Flutter 3.50. The Android module uses built-in Kotlin, so apps
+> build with `android.builtInKotlin` set to either `true` or `false`.
+>
+> Call `loadSoundfont('')` to use built-in sounds with no soundfont file:
+> Sonivox General MIDI on Android, Apple's `gs_instruments.dls` on macOS, and a
+> small bundled soundfont on iOS (9 basic instruments: piano, electric piano,
+> organ, guitars, violin, trumpet, flute, synth lead). For better sound on iOS,
+> load your own `.sf2` file.
 
 ## Installation
 
@@ -48,7 +55,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.1.5
+  flutter_midi_engine: ^0.2.0
 ```
 
 ## Getting Started
