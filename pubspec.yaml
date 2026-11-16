@@ -1,14 +1,14 @@
 name: flutter_midi_engine
-description: Advanced MIDI synthesizer plugin with SF2/SF3 soundfont support for Flutter. Play MIDI notes, load soundfonts, and control multi-channel synthesis on Android and iOS.
-version: 0.1.5
+description: Advanced MIDI synthesizer plugin with SF2/SF3 soundfont support for Flutter. Play MIDI notes, load soundfonts, and control multi-channel synthesis on Android, iOS and macOS.
+version: 0.2.0
 homepage: https://github.com/Brewnbeer/flutter_midi_engine
 repository: https://github.com/Brewnbeer/flutter_midi_engine
 issue_tracker: https://github.com/Brewnbeer/flutter_midi_engine/issues
 documentation: https://github.com/Brewnbeer/flutter_midi_engine#readme
 
 environment:
-  sdk: ^3.10.0
-  flutter: ">=3.44.0"
+  sdk: ^3.14.0
+  flutter: ">=3.50.0"
 
 dependencies:
   flutter:
@@ -34,6 +34,8 @@ flutter:
         package: com.midiengine.flutter_midi_engine
         pluginClass: FlutterMidiEnginePlugin
       ios:
+        pluginClass: FlutterMidiEnginePlugin
+      macos:
         pluginClass: FlutterMidiEnginePlugin
       web:
         pluginClass: FlutterMidiEngineWeb

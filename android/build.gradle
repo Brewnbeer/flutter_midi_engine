@@ -12,22 +12,10 @@ rootProject.allprojects {
     repositories {
         google()
         mavenCentral()
-        maven { url = 'https://jitpack.io' }
     }
 }
 
 apply plugin: 'com.android.library'
-
-// Built-in Kotlin migration (Flutter 3.44+).
-// Android Gradle Plugin 9 ships Kotlin support built in. On AGP 8 and earlier the
-// legacy Kotlin Gradle plugin must still be applied, so detect the AGP version and
-// only apply 'kotlin-android' when running against AGP < 9. This keeps the plugin
-// building on both AGP 8 and AGP 9 projects.
-// See https://docs.flutter.dev/release/breaking-changes/migrate-to-built-in-kotlin
-def agpMajor = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION.tokenize('.')[0] as int
-if (agpMajor < 9) {
-    apply plugin: 'kotlin-android'
-}
 
 android {
     namespace = 'com.midiengine.flutter_midi_engine'
@@ -54,6 +42,7 @@ kotlin {
 }
 
 dependencies {
-    // FluidSynth-compatible MIDI driver for Android - supports SF2/SF3
-    implementation 'com.github.billthefarmer:mididriver:1.25'
+    // Sonivox EAS MIDI driver (same API as billthefarmer/mididriver).
+    // v1.30 is built with 16 KB page alignment, required by Google Play.
+    implementation 'io.github.nikita36078:mididriver:v1.30'
 }
