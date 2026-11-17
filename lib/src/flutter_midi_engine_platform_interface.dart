@@ -20,7 +20,7 @@ abstract class FlutterMidiEnginePlatform extends PlatformInterface {
   }
 
   /// Load a soundfont file from the given path
-  /// Supports SF2, SF3, and other compatible formats
+  /// An empty path loads the built-in sounds.
   Future<bool> loadSoundfont(String path) {
     throw UnimplementedError('loadSoundfont() has not been implemented.');
   }
