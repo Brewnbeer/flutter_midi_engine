@@ -1,3 +1,12 @@
+## 0.2.1
+
+* Android: `loadSoundfont('')` now works. Before, it returned `false` because
+  the empty path was checked as a file, so the example app never started.
+* Docs: Android can't load soundfont files and always uses the built-in Sonivox
+  sounds. The README and API docs said otherwise.
+* Docs: removed SF3 and FluidSynth mentions, updated the implementation guide
+  for macOS and the bundled iOS soundfont, and wrote a README for the example app.
+
 ## 0.2.0
 
 * Requires Flutter 3.50 / Dart 3.14.

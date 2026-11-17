@@ -204,21 +204,19 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
 
     private fun loadSoundfont(path: String): Boolean {
         return try {
-            val file = File(path)
-            if (!file.exists()) {
-                Log.e(TAG, "Soundfont file not found: $path")
-                return false
+            // Sonivox can't load soundfont files, it always uses its built-in sounds.
+            if (path.isNotEmpty()) {
+                if (!File(path).exists()) {
+                    Log.e(TAG, "Soundfont file not found: $path")
+                    return false
+                }
+                Log.w(TAG, "Custom soundfonts are not supported on Android, using built-in sounds")
             }
 
-            // Initialize MIDI driver if not already done
             if (midiDriver == null) {
                 midiDriver = MidiDriver.getInstance()
                 midiDriver?.start()
             }
-
-            // Note: The MidiDriver library uses Sonivox EAS (built-in soundfont)
-            // Custom soundfont loading is not directly supported by this library
-            // The library uses the Android system's built-in synthesizer
             soundfontLoaded = true
 
             Log.i(TAG, "MIDI driver initialized (using system synthesizer)")
@@ -290,8 +288,6 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
         for (ch in 0..15) {
             sendControlChange(CC_REVERB, (level * 127).toInt(), ch)
         }
-        // Note: FluidSynth's reverb parameters (room size, damping, width)
-        // would need SysEx messages or a custom FluidSynth build
     }
 
     private fun setChorus(voices: Int, level: Double, speed: Double, depth: Double) {
@@ -299,7 +295,6 @@ class FlutterMidiEnginePlugin : FlutterPlugin, MethodCallHandler {
         for (ch in 0..15) {
             sendControlChange(CC_CHORUS, (level * 127).toInt(), ch)
         }
-        // Note: FluidSynth's chorus parameters would need SysEx messages
     }
 
     private fun stopAllNotes() {

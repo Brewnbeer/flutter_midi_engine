@@ -8,11 +8,10 @@ import 'src/flutter_midi_engine_platform_interface.dart';
 
 export 'src/flutter_midi_engine_platform_interface.dart';
 
-/// Flutter MIDI Engine - Advanced MIDI synthesizer with SF2/SF3 soundfont support
+/// MIDI synthesizer for Android, iOS and macOS.
 ///
-/// This plugin provides a comprehensive MIDI synthesizer for Flutter applications
-/// with support for:
-/// - SF2 and SF3 soundfont formats
+/// Supports:
+/// - Built-in General MIDI sounds, or SF2 soundfonts on iOS and macOS
 /// - Multi-channel MIDI playback (16 channels)
 /// - Program changes (instrument selection)
 /// - Audio effects (reverb, chorus)
@@ -23,8 +22,8 @@ export 'src/flutter_midi_engine_platform_interface.dart';
 /// ```dart
 /// final midiEngine = FlutterMidiEngine();
 ///
-/// // Load a soundfont
-/// await midiEngine.loadSoundfont('path/to/soundfont.sf2');
+/// // Load the built-in sounds
+/// await midiEngine.loadSoundfont('');
 ///
 /// // Play a note
 /// await midiEngine.playNote(note: 60, velocity: 100);
@@ -41,7 +40,8 @@ class FlutterMidiEngine {
 
   /// Load a soundfont file from the given path
   ///
-  /// [path] - Absolute path to the soundfont file (SF2 or SF3)
+  /// [path] - Absolute path to an SF2 file, or '' for the built-in sounds.
+  /// Android always uses its built-in sounds.
   /// Returns true if the soundfont was loaded successfully
   ///
   /// Example:
