@@ -8,10 +8,10 @@ import 'src/flutter_midi_engine_platform_interface.dart';
 
 export 'src/flutter_midi_engine_platform_interface.dart';
 
-/// MIDI synthesizer for Android, iOS and macOS.
+/// MIDI synthesizer for Android, iOS, macOS and the web.
 ///
 /// Supports:
-/// - Built-in General MIDI sounds, or SF2 soundfonts on iOS and macOS
+/// - Built-in General MIDI sounds, or SF2 soundfonts on iOS, macOS and the web
 /// - Multi-channel MIDI playback (16 channels)
 /// - Program changes (instrument selection)
 /// - Audio effects (reverb, chorus)
@@ -41,7 +41,7 @@ class FlutterMidiEngine {
   /// Load a soundfont file from the given path
   ///
   /// [path] - Absolute path to an SF2 file, or '' for the built-in sounds.
-  /// Android always uses its built-in sounds.
+  /// On the web, [path] is a URL. Android always uses its built-in sounds.
   /// Returns true if the soundfont was loaded successfully
   ///
   /// Example:
@@ -70,6 +70,12 @@ class FlutterMidiEngine {
   }) async {
     try {
       final byteData = await rootBundle.load(assetPath);
+      if (kIsWeb) {
+        // No file system on the web: hand the bytes to the synth directly.
+        return await _platform.loadSoundfontBytes(
+          byteData.buffer.asUint8List(byteData.offsetInBytes, byteData.lengthInBytes),
+        );
+      }
       final file = await _writeBytesToFile(
         byteData,
         fileName ?? assetPath.split('/').last,

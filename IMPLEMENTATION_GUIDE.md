@@ -7,17 +7,24 @@ How the plugin works on each platform.
 ```
 lib/
   flutter_midi_engine.dart                  public API
-  flutter_midi_engine_web.dart              web stub (does nothing yet)
+  flutter_midi_engine_web.dart              web plugin (SpessaSynth)
   src/flutter_midi_engine_platform_interface.dart
   src/flutter_midi_engine_method_channel.dart
 android/src/main/kotlin/.../FlutterMidiEnginePlugin.kt
-ios/Classes/FlutterMidiEnginePlugin.swift
-ios/Resources/flutter_midi_engine_basic.sf2  default iOS soundfont
-macos/Classes/FlutterMidiEnginePlugin.swift
-tool/generate_soundfont.py                  builds the iOS soundfont
+ios/flutter_midi_engine/Sources/flutter_midi_engine/FlutterMidiEnginePlugin.swift
+ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2  default iOS soundfont
+macos/flutter_midi_engine/Sources/flutter_midi_engine/FlutterMidiEnginePlugin.swift
+assets/web/spessasynth_*.min.js             web synthesizer (web-only assets)
+tool/generate_soundfont.py                  builds the built-in soundfont
+tool/build_web_synth.sh                     rebuilds assets/web from SpessaSynth
 ```
 
-All platforms use one method channel named `flutter_midi_engine`.
+`ios/flutter_midi_engine` and `macos/flutter_midi_engine` are Swift packages
+(`Package.swift`). The podspecs point at the same sources, so CocoaPods and
+Swift Package Manager both work.
+
+Android, iOS and macOS use one method channel named `flutter_midi_engine`.
+The web plugin calls SpessaSynth directly.
 
 ## Android
 
@@ -53,11 +60,19 @@ All platforms use one method channel named `flutter_midi_engine`.
 
 ## Web
 
-Not implemented. Every method only prints a debug message.
+- Uses [SpessaSynth](https://github.com/spessasus/spessasynth_lib) (Apache-2.0),
+  an SF2/SF3/DLS synthesizer that runs in an AudioWorklet.
+- The JS files are web-only plugin assets in `assets/web` (no CDN), loaded the
+  first time `loadSoundfont` is called. `tool/build_web_synth.sh` rebuilds them.
+- `loadSoundfont('')` loads the same built-in soundfont as iOS. A non-empty path
+  is a URL. `loadSoundfontFromAsset` passes the bytes through `loadSoundfontBytes`.
+- Browsers keep audio suspended until the user interacts with the page. The
+  plugin resumes it on the first tap, click or key press, and `unmute` does too.
+- Each of the 16 channels keeps its own instrument; channel 9 plays drums.
 
-## Built-in iOS soundfont
+## Built-in soundfont (iOS and web)
 
-`tool/generate_soundfont.py` writes `ios/Resources/flutter_midi_engine_basic.sf2`.
+`tool/generate_soundfont.py` writes `ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2`.
 All sounds are synthesized by the script, so the file has no third-party licence.
 It has 9 presets in bank 0: programs 0, 4, 19, 24, 27, 40, 56, 73 and 80.
 

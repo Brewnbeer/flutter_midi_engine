@@ -1,6 +1,6 @@
 name: flutter_midi_engine
-description: MIDI synthesizer plugin for Flutter. Play MIDI notes with built-in General MIDI sounds or SF2 soundfonts on Android, iOS and macOS.
-version: 0.2.1
+description: MIDI synthesizer plugin for Flutter. Play MIDI notes with built-in General MIDI sounds or SF2 soundfonts on Android, iOS, macOS and the web.
+version: 0.3.0
 homepage: https://github.com/Brewnbeer/flutter_midi_engine
 repository: https://github.com/Brewnbeer/flutter_midi_engine
 issue_tracker: https://github.com/Brewnbeer/flutter_midi_engine/issues
@@ -17,6 +17,7 @@ dependencies:
     sdk: flutter
   plugin_platform_interface: ^2.1.8
   path_provider: ^2.1.5
+  web: ^1.1.1
 
 dev_dependencies:
   flutter_test:
@@ -40,6 +41,16 @@ flutter:
       web:
         pluginClass: FlutterMidiEngineWeb
         fileName: flutter_midi_engine_web.dart
+
+  # Web-only assets: the SpessaSynth synthesizer (see tool/build_web_synth.sh)
+  # and the built-in soundfont. They are not added to Android, iOS or macOS apps.
+  assets:
+    - path: assets/web/spessasynth_lib.min.js
+      platforms: [web]
+    - path: assets/web/spessasynth_processor.min.js
+      platforms: [web]
+    - path: ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2
+      platforms: [web]
 
   # To add assets to your package, add an assets section, like this:
   # assets:

@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_midi_engine'
-  s.version          = '0.2.1'
+  s.version          = '0.3.0'
   s.summary          = 'MIDI synthesizer plugin with SF2 soundfont support'
   s.description      = <<-DESC
 Flutter MIDI Engine for macOS. Plays MIDI notes through Apple's AUSampler with SF2 soundfonts.
@@ -13,7 +13,7 @@ Flutter MIDI Engine for macOS. Plays MIDI notes through Apple's AUSampler with S
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Aditya Sutar' => 'brewnbeer34@gmail.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'flutter_midi_engine/Sources/flutter_midi_engine/**/*.swift'
   s.dependency 'FlutterMacOS'
   s.platform = :osx, '10.15'
 

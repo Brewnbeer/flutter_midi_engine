@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'flutter_midi_engine_method_channel.dart';
 
@@ -142,6 +144,12 @@ abstract class FlutterMidiEnginePlatform extends PlatformInterface {
     int channel = 0,
   }) {
     throw UnimplementedError('sendPitchBend() has not been implemented.');
+  }
+
+  /// Load a soundfont from its raw bytes.
+  /// Used on the web, where there is no file system to write the file to.
+  Future<bool> loadSoundfontBytes(Uint8List bytes) {
+    throw UnimplementedError('loadSoundfontBytes() has not been implemented.');
   }
 
   /// Unmute the device (iOS specific - allows sound even if device is muted)

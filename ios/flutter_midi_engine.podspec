@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'flutter_midi_engine'
-  s.version          = '0.2.1'
+  s.version          = '0.3.0'
   s.summary          = 'Advanced MIDI synthesizer plugin with SF2/SF3 soundfont support'
   s.description      = <<-DESC
 Flutter MIDI Engine provides comprehensive MIDI synthesis capabilities with support for SF2/SF3 soundfonts,
@@ -14,9 +14,9 @@ multi-channel playback, program changes, audio effects, and more.
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Aditya Sutar' => 'brewnbeer34@gmail.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
+  s.source_files = 'flutter_midi_engine/Sources/flutter_midi_engine/**/*.swift'
   # Built-in soundfont used by loadSoundfont('') (see tool/generate_soundfont.py)
-  s.resource_bundles = { 'flutter_midi_engine_sounds' => ['Resources/*.sf2'] }
+  s.resource_bundles = { 'flutter_midi_engine_sounds' => ['flutter_midi_engine/Sources/flutter_midi_engine/Resources/*.sf2'] }
   s.dependency 'Flutter'
   s.platform = :ios, '13.0'
 

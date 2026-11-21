@@ -1,11 +1,11 @@
 # Flutter MIDI Engine
 
-A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sounds, or load your own SF2 soundfont on iOS and macOS.
+A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sounds, or load your own SF2 soundfont on iOS, macOS and the web.
 
 ## Features
 
 - **Built-in sounds**: `loadSoundfont('')` works with no soundfont file
-- **SF2 soundfonts**: load your own `.sf2` on iOS and macOS
+- **SF2 soundfonts**: load your own `.sf2` on iOS, macOS and the web
 - **Multi-Channel MIDI**: Full 16-channel MIDI support for complex arrangements
 - **Program Changes**: Switch between 128 different instruments per soundfont
 - **Audio Effects**: Built-in reverb and chorus effects
@@ -18,7 +18,7 @@ A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sou
 - **Automatic Audio Routing**: Audio follows the active output device — plug in or
   unplug a wired/Bluetooth headset mid-playback and sound switches over automatically
   (no manual re-initialization required)
-- **Cross-Platform**: Android, iOS and macOS
+- **Cross-Platform**: Android, iOS, macOS and the web
 
 ## Platform Support
 
@@ -27,7 +27,7 @@ A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sou
 | Android  | ✅ Supported (built-in sounds only) | MidiDriver (Sonivox EAS) |
 | iOS      | ✅ Supported | AudioToolbox AUSampler |
 | macOS    | ✅ Supported | AudioToolbox AUSampler |
-| Web      | ❌ Not implemented yet | - |
+| Web      | ✅ Supported | [SpessaSynth](https://github.com/spessasus/spessasynth_lib) (Web Audio AudioWorklet) |
 | Windows  | 🚧 Planned | - |
 | Linux    | 🚧 Planned | - |
 
@@ -40,15 +40,19 @@ A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sou
 | Android | `minSdk` 24 (Android 7.0) |
 | iOS | 13.0 |
 | macOS | 10.15 |
+| Web | A browser with AudioWorklet support (current Chrome, Edge, Firefox, Safari) |
 
 > Tested with Flutter 3.50. The Android module uses built-in Kotlin, so apps
 > build with `android.builtInKotlin` set to either `true` or `false`.
 >
+> On iOS and macOS the plugin works with both Swift Package Manager and
+> CocoaPods.
+>
 > Call `loadSoundfont('')` to use built-in sounds with no soundfont file:
 > Sonivox General MIDI on Android, Apple's `gs_instruments.dls` on macOS, and a
-> small bundled soundfont on iOS (9 basic instruments: piano, electric piano,
-> organ, guitars, violin, trumpet, flute, synth lead). For better sound on iOS,
-> load your own `.sf2` file.
+> small bundled soundfont on iOS and the web (9 basic instruments: piano,
+> electric piano, organ, guitars, violin, trumpet, flute, synth lead). For better
+> sound on iOS and the web, load your own `.sf2` file.
 >
 > Android can't load soundfont files. It always plays the built-in Sonivox sounds,
 > even if you pass a path.
@@ -59,7 +63,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.2.1
+  flutter_midi_engine: ^0.3.0
 ```
 
 ## Getting Started
@@ -67,7 +71,7 @@ dependencies:
 ### 1. Add a Soundfont (optional)
 
 Skip this to use the built-in sounds with `loadSoundfont('')`. To use your own
-SF2 file on iOS and macOS, add it to your assets:
+SF2 file on iOS, macOS and the web, add it to your assets:
 
 ```yaml
 flutter:
@@ -85,7 +89,7 @@ final midiEngine = FlutterMidiEngine();
 // Built-in sounds
 await midiEngine.loadSoundfont('');
 
-// Or your own soundfont from assets (iOS and macOS)
+// Or your own soundfont from assets (iOS, macOS and the web)
 // await midiEngine.loadSoundfontFromAsset('assets/soundfonts/piano.sf2');
 
 // Play middle C
@@ -176,6 +180,21 @@ await midiEngine.unmute();
 await midiEngine.loadSoundfontFromAsset('assets/soundfonts/piano.sf2');
 ```
 
+## Web Setup
+
+No setup is needed. The synthesizer and the built-in soundfont ship with the
+plugin as web-only assets (about 1.5 MB, loaded the first time you call
+`loadSoundfont`). They are not added to Android, iOS or macOS apps.
+
+- Browsers block audio until the user interacts with the page. The plugin
+  resumes audio on the first tap, click or key press, so the first note you play
+  from a tap is heard. You can also call `unmute()` from a tap handler.
+- On the web, `loadSoundfont(path)` takes a URL (for example
+  `'https://example.com/piano.sf2'` or a path relative to your app).
+  `loadSoundfontFromAsset` works too. SF2, SF3 and DLS files are supported.
+- Unlike iOS and macOS, each of the 16 channels keeps its own instrument, and
+  channel 9 (the 10th) plays drums.
+
 ## Audio Routing (Headset / Bluetooth)
 
 The engine follows the active audio output device automatically. When a
@@ -192,6 +211,7 @@ Under the hood:
   audio graph so the sampler follows the new device. It also recovers automatically
   after interruptions such as phone calls.
 - **macOS** follows the default output device set in System Settings.
+- **Web** plays through the browser, which follows the system output device.
 
 ## Example App
 
@@ -270,7 +290,7 @@ Free soundfonts you can use:
 - Verify device volume is turned up
 
 **Issue**: My soundfont sounds the same as the default
-- Android always uses the built-in Sonivox sounds. Custom soundfonts work on iOS and macOS only.
+- Android always uses the built-in Sonivox sounds. Custom soundfonts work on iOS, macOS and the web.
 
 ### iOS
 
@@ -283,6 +303,14 @@ Free soundfonts you can use:
 **Issue**: Soundfont not found
 - Verify the file path is correct
 - When using assets, make sure the file is listed in `pubspec.yaml`
+
+### Web
+
+**Issue**: No sound on the web
+- Click or tap the page first. Browsers block audio until the user interacts.
+- Make sure `loadSoundfont('')` returned `true`
+- A custom soundfont URL must be reachable from the browser (same origin, or
+  served with CORS headers)
 
 ### Audio routing
 
@@ -302,4 +330,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 Built with:
 - Android: [MidiDriver](https://github.com/billthefarmer/mididriver) (Sonivox EAS)
 - iOS and macOS: AudioToolbox AUSampler
+- Web: [SpessaSynth](https://github.com/spessasus/spessasynth_lib) by Spessasus
+  (Apache-2.0, see `assets/web/SPESSASYNTH_LICENSE`)
 - Inspired by: [flutter_midi](https://github.com/rodydavis/flutter_midi)
