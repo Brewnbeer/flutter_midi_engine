@@ -6,7 +6,7 @@ by this script, so the file has no third-party licence.
 
 Run from the repo root:
     python tool/generate_soundfont.py
-Writes ios/Resources/flutter_midi_engine_basic.sf2
+Writes ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2
 """
 
 import math
@@ -16,7 +16,7 @@ import struct
 SAMPLE_RATE = 32000
 LOOP_LEN = 3200  # 0.1 s. Each sample frequency is a multiple of 10 Hz so the loop is seamless.
 LOOP_REPEATS = 2  # sample = 1 loop of attack + this many loops
-OUT = os.path.join(os.path.dirname(__file__), "..", "ios", "Resources", "flutter_midi_engine_basic.sf2")
+OUT = os.path.join(os.path.dirname(__file__), "..", "ios", "flutter_midi_engine", "Sources", "flutter_midi_engine", "Resources", "flutter_midi_engine_basic.sf2")
 
 # (low key, high key, root key) for each zone
 ZONES = [(0, 59, 48), (60, 83, 72), (84, 127, 96)]

@@ -100,3 +100,7 @@ coverage/
 # Local build output and tool settings
 **/android/build/
 .claude/
+
+# Swift Package Manager
+**/flutter_midi_engine/.build/
+**/flutter_midi_engine/.swiftpm/

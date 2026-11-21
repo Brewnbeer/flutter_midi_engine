@@ -11,9 +11,9 @@ lib/
   src/flutter_midi_engine_platform_interface.dart
   src/flutter_midi_engine_method_channel.dart
 android/src/main/kotlin/.../FlutterMidiEnginePlugin.kt
-ios/Classes/FlutterMidiEnginePlugin.swift
-ios/Resources/flutter_midi_engine_basic.sf2  default iOS soundfont
-macos/Classes/FlutterMidiEnginePlugin.swift
+ios/flutter_midi_engine/Sources/flutter_midi_engine/FlutterMidiEnginePlugin.swift
+ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2  default iOS soundfont
+macos/flutter_midi_engine/Sources/flutter_midi_engine/FlutterMidiEnginePlugin.swift
 tool/generate_soundfont.py                  builds the iOS soundfont
 ```
 
@@ -57,7 +57,7 @@ Not implemented. Every method only prints a debug message.
 
 ## Built-in iOS soundfont
 
-`tool/generate_soundfont.py` writes `ios/Resources/flutter_midi_engine_basic.sf2`.
+`tool/generate_soundfont.py` writes `ios/flutter_midi_engine/Sources/flutter_midi_engine/Resources/flutter_midi_engine_basic.sf2`.
 All sounds are synthesized by the script, so the file has no third-party licence.
 It has 9 presets in bank 0: programs 0, 4, 19, 24, 27, 40, 56, 73 and 80.
 

@@ -1,6 +1,6 @@
 name: flutter_midi_engine
 description: MIDI synthesizer plugin for Flutter. Play MIDI notes with built-in General MIDI sounds or SF2 soundfonts on Android, iOS and macOS.
-version: 0.2.1
+version: 0.2.2
 homepage: https://github.com/Brewnbeer/flutter_midi_engine
 repository: https://github.com/Brewnbeer/flutter_midi_engine
 issue_tracker: https://github.com/Brewnbeer/flutter_midi_engine/issues

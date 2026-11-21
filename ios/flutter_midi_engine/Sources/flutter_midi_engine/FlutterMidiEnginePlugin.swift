@@ -343,6 +343,13 @@ public class FlutterMidiEnginePlugin: NSObject, FlutterPlugin {
     }
 
     private static func bundledSoundfontPath() -> String? {
+        #if SWIFT_PACKAGE
+        // Swift Package Manager puts the resources in the package's own bundle.
+        if let path = Bundle.module.path(forResource: "flutter_midi_engine_basic", ofType: "sf2") {
+            return path
+        }
+        #endif
+        // CocoaPods: resources live in the flutter_midi_engine_sounds bundle.
         let bundle = Bundle(for: FlutterMidiEnginePlugin.self)
         if let url = bundle.url(forResource: "flutter_midi_engine_sounds", withExtension: "bundle"),
            let resources = Bundle(url: url),

@@ -59,7 +59,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.2.1
+  flutter_midi_engine: ^0.2.2
 ```
 
 ## Getting Started

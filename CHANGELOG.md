@@ -1,3 +1,8 @@
+## 0.2.2
+
+* Added Swift Package Manager support for iOS and macOS (#5). Fixes the
+  "plugin does not support Swift Package Manager" warning. CocoaPods still works.
+
 ## 0.2.1
 
 * Android: `loadSoundfont('')` now works. Before, it returned `false` because
