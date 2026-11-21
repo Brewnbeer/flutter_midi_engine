@@ -40,9 +40,13 @@ A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sou
 | Android | `minSdk` 24 (Android 7.0) |
 | iOS | 13.0 |
 | macOS | 10.15 |
+| Web | A browser with AudioWorklet support (current Chrome, Edge, Firefox, Safari) |
 
 > Tested with Flutter 3.50. The Android module uses built-in Kotlin, so apps
 > build with `android.builtInKotlin` set to either `true` or `false`.
+>
+> On iOS and macOS the plugin works with both Swift Package Manager and
+> CocoaPods.
 >
 > Call `loadSoundfont('')` to use built-in sounds with no soundfont file:
 > Sonivox General MIDI on Android, Apple's `gs_instruments.dls` on macOS, and a
@@ -59,7 +63,7 @@ Add this to your package's `pubspec.yaml` file:
 
 ```yaml
 dependencies:
-  flutter_midi_engine: ^0.2.2
+  flutter_midi_engine: ^0.3.0
 ```
 
 ## Getting Started
@@ -67,7 +71,7 @@ dependencies:
 ### 1. Add a Soundfont (optional)
 
 Skip this to use the built-in sounds with `loadSoundfont('')`. To use your own
-SF2 file on iOS and macOS, add it to your assets:
+SF2 file on iOS, macOS and the web, add it to your assets:
 
 ```yaml
 flutter:
@@ -85,7 +89,7 @@ final midiEngine = FlutterMidiEngine();
 // Built-in sounds
 await midiEngine.loadSoundfont('');
 
-// Or your own soundfont from assets (iOS and macOS)
+// Or your own soundfont from assets (iOS, macOS and the web)
 // await midiEngine.loadSoundfontFromAsset('assets/soundfonts/piano.sf2');
 
 // Play middle C
@@ -286,7 +290,7 @@ Free soundfonts you can use:
 - Verify device volume is turned up
 
 **Issue**: My soundfont sounds the same as the default
-- Android always uses the built-in Sonivox sounds. Custom soundfonts work on iOS and macOS only.
+- Android always uses the built-in Sonivox sounds. Custom soundfonts work on iOS, macOS and the web.
 
 ### iOS
 

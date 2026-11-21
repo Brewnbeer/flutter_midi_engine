@@ -9,4 +9,4 @@ You can pick an instrument and change the volume.
 flutter run -d <device>
 ```
 
-Works on Android, iOS and macOS.
+Works on Android, iOS, macOS and the web (`flutter run -d chrome`).

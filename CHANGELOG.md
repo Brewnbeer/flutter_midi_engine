@@ -1,4 +1,4 @@
-## Unreleased
+## 0.3.0
 
 * Added web support. Notes play through SpessaSynth, an SF2/SF3/DLS synthesizer
   running in an AudioWorklet, bundled with the plugin as web-only assets (no CDN).
@@ -7,9 +7,6 @@
 * `loadSoundfontFromAsset` now works on the web (it passes the bytes directly
   instead of writing a temporary file).
 * Added `FlutterMidiEnginePlatform.loadSoundfontBytes`.
-
-## 0.2.2
-
 * Added Swift Package Manager support for iOS and macOS (#5). Fixes the
   "plugin does not support Swift Package Manager" warning. CocoaPods still works.
 
