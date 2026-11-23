@@ -1,5 +1,7 @@
 # Flutter MIDI Engine
 
+![Flutter MIDI Engine](https://raw.githubusercontent.com/Brewnbeer/flutter_midi_engine/main/doc/banner.png)
+
 A MIDI synthesizer plugin for Flutter. Play notes with built-in General MIDI sounds, or load your own SF2 soundfont on iOS, macOS and the web.
 
 ## Features
